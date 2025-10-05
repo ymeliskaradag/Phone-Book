@@ -3,24 +3,27 @@ package com.meliskaradag.telefonrehberiuygulamasi.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-
-/*private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)*/
+import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.unit.dp
 
 private val LightColors = lightColorScheme(
-    primary = Primary,
-    onPrimary = OnPrimary,
-    secondary = Secondary,
-    onSecondary = OnSecondary,
+    primary = BrandBlue,
+    onPrimary = Color.White,
+    secondary = Gray500,
+    onSecondary = Color.White,
     background = Background,
     onBackground = OnBackground,
-    surface = Surface,
+    surface = SurfaceColor,
     onSurface = OnSurface,
     outline = Outline,
-    error = Error
+    error = ErrorRed
+)
+
+private val AppShapes = Shapes(
+    small  = RoundedCornerShape(8.dp),
+    medium = RoundedCornerShape(12.dp), //list kartları
+    large  = RoundedCornerShape(20.dp)  //sayfa içindeki büyük paneller (Figma’da yuvarlak köşeler)
 )
 
 @Composable

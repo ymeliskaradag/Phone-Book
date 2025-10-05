@@ -18,6 +18,7 @@ room = "2.8.1"
 lifecycle = "2.9.4"
 
 [libraries]
+compose-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <!-- Spacing -->
-    <dimen name="spacing_xs">4dp</dimen>
-    <dimen name="spacing_s">8dp</dimen>
-    <dimen name="spacing_m">12dp</dimen>
-    <dimen name="spacing_l">16dp</dimen>
-    <dimen name="spacing_xl">24dp</dimen>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">12dp</dimen>
+    <dimen name="space_l">16dp</dimen>
+    <dimen name="space_xl">24dp</dimen>
 
-    <!-- Ikon/avatar -->
+    <dimen name="list_item_radius">12dp</dimen>
+    <dimen name="panel_radius">20dp</dimen>
+
     <dimen name="icon_s">18dp</dimen>
     <dimen name="icon_m">24dp</dimen>
-    <dimen name="avatar_m">48dp</dimen>
-
-    <!-- Köşe yarıçapları -->
-    <dimen name="radius_s">8dp</dimen>
-    <dimen name="radius_m">12dp</dimen>
-    <dimen name="radius_l">16dp</dimen>
+    <dimen name="avatar_m">40dp</dimen> <!-- Figma’da yaklaşık -->
 </resources>
-
