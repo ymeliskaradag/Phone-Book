@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.meliskaradag.telefonrehberiuygulamasi.presentation.navigation.AppNav
-import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.TelefonRehberiUygulamasiTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

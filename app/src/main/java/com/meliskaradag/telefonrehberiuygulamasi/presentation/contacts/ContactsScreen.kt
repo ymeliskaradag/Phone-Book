@@ -27,60 +27,57 @@ fun ContactsScreen(
     onEdit: (String) -> Unit,
     vm: ContactsViewModel = viewModel()
 ) {
-    val state by vm.state.collectAsState()
-
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddNew) { Icon(Icons.Default.Add, contentDescription = "Yeni") }
-        }
-    ) { pad ->
-        Column(Modifier.padding(pad).fillMaxSize()) {
-            //Arama kutusu + recent queries dropdown
-            var tf by remember { mutableStateOf(TextFieldValue(state.query)) }
-            var showRecent by remember { mutableStateOf(false) }
-
-            OutlinedTextField(
-                value = tf,
-                onValueChange = {
-                    tf = it; vm.onEvent(ContactsEvent.OnQueryChange(it.text))
-                    showRecent = true
-                },
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                label = { Text("İsim/Telefon ara") },
-                singleLine = true
+            FloatingActionButton(
+                onClick = onAdd,
+                containerColor = BrandBlue,
+                contentColor = Color.White,
+                shape = CircleShape
+            ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "Add") }
+        },
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("Contacts", style = MaterialTheme.typography.titleLarge) }
             )
-            DropdownMenu(expanded = showRecent && state.recentQueries.isNotEmpty(),
-                onDismissRequest = { showRecent = false }) {
-                state.recentQueries.forEach { q ->
-                    DropdownMenuItem(text = { Text(q) }, onClick = {
-                        tf = TextFieldValue(q)
-                        vm.onEvent(ContactsEvent.OnQueryChange(q))
-                        vm.onEvent(ContactsEvent.OnSearch); showRecent = false
-                    })
-                }
-            }
+        }
+    ) { padding ->
+        Column(Modifier.padding(padding).padding(horizontal = 16.dp)) {
+            SearchField(value = state.query, onChange = { vm.onEvent(ContactsEvent.OnQuery(it)) })
+            Spacer(Modifier.height(12.dp))
 
-            // Liste
-            if (state.isLoading) LinearProgressIndicator(Modifier.fillMaxWidth())
-
-            LazyColumn(Modifier.fillMaxSize()) {
-                state.grouped.toSortedMap().forEach { (letter, itemsForLetter) ->
-                    stickyHeader {
-                        Surface(tonalElevation = 3.dp, modifier = Modifier.fillMaxWidth()) {
-                            Text(letter.toString(), style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
+            if (state.items.isEmpty()) {
+                EmptyState(onCreate = onAdd)
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    state.grouped.forEach { (letter, contacts) ->
+                        stickyHeader {
+                            Text(
+                                letter.toString(),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Background)
+                                    .padding(vertical = 8.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Gray400
+                            )
                         }
-                    }
-                    items(itemsForLetter, key = { it.id }) { c ->
-                        ContactRow(
-                            contact = c,
-                            onClick = { onEdit(c.id) },
-                            onDelete = { vm.onEvent(ContactsEvent.OnDelete(c.id)) }
-                        )
-                        HorizontalDivider(
-                            thickness = 0.5.dp,
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
+                        items(contacts, key = { it.id }) { c ->
+                            Surface(shape = MaterialTheme.shapes.medium, tonalElevation = 0.dp, shadowElevation = 0.dp, color = SurfaceColor) {
+                                ContactRow(
+                                    contact = c,
+                                    onClick = { onEdit(c.id) },
+                                    onDelete = { vm.onEvent(ContactsEvent.OnDelete(c.id)) }
+                                )
+                                HorizontalDivider(
+                                    thickness = 0.5.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant
+                                )
+                            }
+                        }
                     }
                 }
             }

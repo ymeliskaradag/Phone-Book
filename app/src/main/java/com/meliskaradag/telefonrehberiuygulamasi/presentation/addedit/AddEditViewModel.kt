@@ -15,7 +15,7 @@ class AddEditViewModel(app: Application) : AndroidViewModel(app) {
     fun loadIfEdit(contactId: String?) {
         if (contactId == null) return
         state.value = state.value.copy(contactId = contactId)
-        // eldeki cache/akıştan bul: listedeki son veriden seçmek yeterli
+        // eldeki cache'ten bul: listedeki son veriden seçmek yeterli
         viewModelScope.launch {
             use.get().collect { list ->
                 list.find { it.id == contactId }?.let { c ->
