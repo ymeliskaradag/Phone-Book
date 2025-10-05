@@ -17,6 +17,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.meliskaradag.telefonrehberiuygulamasi.domain.model.Contact
+import androidx.compose.ui.res.painterResource
+import com.meliskaradag.telefonrehberiuygulamasi.R
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +35,7 @@ fun ContactsScreen(
         }
     ) { pad ->
         Column(Modifier.padding(pad).fillMaxSize()) {
-            // Arama kutusu + recent queries dropdown
+            //Arama kutusu + recent queries dropdown
             var tf by remember { mutableStateOf(TextFieldValue(state.query)) }
             var showRecent by remember { mutableStateOf(false) }
 
@@ -93,11 +95,11 @@ private fun ContactRow(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    // Material3 SwipeToDismissBox
-    var dismissState = rememberSwipeToDismissBoxState()
+    //Material3 SwipeToDismissBox
+    val dismissState = rememberSwipeToDismissBoxState()
 
     if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-        onDelete(); // sola kaydırınca silmesi için
+        onDelete() //sola kaydırınca silmek için
         LaunchedEffect(Unit) { dismissState.reset() }
     }
 
@@ -106,26 +108,47 @@ private fun ContactRow(
         enableDismissFromStartToEnd = false,
         backgroundContent = {
             Row(
-                Modifier.fillMaxSize().background(MaterialTheme.colorScheme.errorContainer)
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.errorContainer)
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
-            ) { Text("Sil", color = MaterialTheme.colorScheme.onErrorContainer) }
+            ) {
+                Text("Sil", color = MaterialTheme.colorScheme.onErrorContainer)
+            }
         },
         content = {
             Row(
-                modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onClick)
+                    .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Person, contentDescription = null)
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("${contact.firstName} ${contact.lastName}",
-                        style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "${contact.firstName} ${contact.lastName}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                     Text(contact.phone, style = MaterialTheme.typography.bodyMedium)
                 }
-                if (contact.isInDeviceContacts) { // cihaz rehberinde ise ikon göstermesi için
-                    AssistChip(onClick = {}, label = { Text("Rehber") })
+
+                //Cihaz rehberinde kayıtlı ise ikon göstermek için
+                if (contact.isInDeviceContacts) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_in_device),
+                        contentDescription = "Cihaz rehberinde kayıtlı",
+                        modifier = Modifier.size(18.dp),
+                        //dimen kullanmak için:
+                        /*modifier = Modifier.size(
+                            // dimen varsa kullan, yoksa 18.dp ile değiştir
+                            dimensionResource(id = R.dimen.icon_s)
+                        ),*/
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }

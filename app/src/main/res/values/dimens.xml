@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+<dimen name="icon_s">18dp</dimen>
+<!-- ileride başka spacing/radius değerleri de eklenecek -->
+</resources>
