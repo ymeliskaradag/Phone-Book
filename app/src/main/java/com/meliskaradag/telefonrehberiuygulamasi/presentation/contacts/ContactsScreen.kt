@@ -75,7 +75,10 @@ fun ContactsScreen(
                             onClick = { onEdit(c.id) },
                             onDelete = { vm.onEvent(ContactsEvent.OnDelete(c.id)) }
                         )
-                        Divider()
+                        HorizontalDivider(
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
                     }
                 }
             }
