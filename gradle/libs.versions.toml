@@ -36,6 +36,7 @@ squareup-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = 
 squareup-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
+#coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 
@@ -51,4 +52,3 @@ androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-lived
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
