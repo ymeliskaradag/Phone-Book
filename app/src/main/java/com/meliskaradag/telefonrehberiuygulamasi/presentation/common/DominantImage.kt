@@ -11,9 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.palette.graphics.Palette
-import coil3.ImageLoader
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
+import coil.ImageLoader
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 
 @Composable
 fun DominantShadowImage(url: String, modifier: Modifier = Modifier) {

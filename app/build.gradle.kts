@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.lottie.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.palette.ktx)
 
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
