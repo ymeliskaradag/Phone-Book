@@ -17,8 +17,31 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.meliskaradag.telefonrehberiuygulamasi.domain.model.Contact
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.SuccessGreen
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.BrandBlue
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray400
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.ErrorRed
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray300
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray900
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Background
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray50
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray100
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray500
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Outline
+import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.SurfaceColor
 import androidx.compose.ui.res.painterResource
 import com.meliskaradag.telefonrehberiuygulamasi.R
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.lazy.stickyHeader
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -30,6 +53,8 @@ fun ContactsScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val ui = vm.state.collectAsState().value
+    val state by androidx.lifecycle.compose.collectAsStateWithLifecycle(vm.state)
 
     // Silme diyaloğunda gösterilecek hedef kişi (null ise dialog kapalı)
     var deleteTarget by remember { mutableStateOf<Contact?>(null) }
@@ -37,11 +62,9 @@ fun ContactsScreen(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                // Yeşil başarı kartı (Figma: #12B76A)
+
                 Snackbar(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clip(MaterialTheme.shapes.medium),
+                    modifier = Modifier.padding(16.dp).clip(MaterialTheme.shapes.medium),
                     containerColor = SuccessGreen,
                     contentColor = Color.White
                 ) {
@@ -58,18 +81,20 @@ fun ContactsScreen(
             ) { Icon(painterResource(R.drawable.ic_add), contentDescription = "Add") }
         },
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = { Text("Contacts", style = MaterialTheme.typography.titleLarge) }
             )
         }
     ) { padding ->
         Column(Modifier.padding(padding).padding(horizontal = 16.dp)) {
-            SearchField(value = state.query, onChange = { vm.onEvent(ContactsEvent.OnQuery(it)) })
+            SearchField(value = ui.query, onChange = { vm.onEvent(ContactsEvent.OnQuery(it)) })
             Spacer(Modifier.height(12.dp))
 
             if (state.items.isEmpty()) {
-                EmptyState(onCreate = onAdd)
+                EmptyState(onCreate = onAddNew)
             } else {
+                //val grouped = remember(ui.items) { ui.items.groupBy { it.firstLetter } }
+
                 LazyColumn(
                     contentPadding = PaddingValues(vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -228,7 +253,7 @@ private fun ContactRow(
                         modifier = Modifier.size(18.dp),
                         //dimen kullanmak için:
                         /*modifier = Modifier.size(
-                            // dimen varsa kullan, yoksa 18.dp ile değiştir
+
                             dimensionResource(id = R.dimen.icon_s)
                         ),*/
                         tint = MaterialTheme.colorScheme.primary
@@ -237,4 +262,84 @@ private fun ContactRow(
             }
         }
     )
+}
+
+@Composable
+private fun SearchField(
+    value: String,
+    onChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "Search"
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onChange,
+        placeholder = {
+            Text(
+                placeholder,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Gray400
+            )
+        },
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyLarge,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text
+        ),
+        shape = MaterialTheme.shapes.medium,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Gray50,
+            unfocusedContainerColor = Gray50,
+            focusedBorderColor = Outline,
+            unfocusedBorderColor = Outline,
+            cursorColor = BrandBlue
+        ),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
+    )
+}
+
+@Composable
+private fun EmptyState(
+    onCreate: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(72.dp)
+                .clip(CircleShape)
+                .background(Gray100),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.PersonAdd,
+                contentDescription = null,
+                tint = BrandBlue
+            )
+        }
+        Spacer(Modifier.height(16.dp))
+        Text(
+            "No contacts yet",
+            style = MaterialTheme.typography.titleLarge,
+            color = Gray900
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Create your first contact.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Gray500
+        )
+        Spacer(Modifier.height(16.dp))
+        Button(onClick = onCreate) {
+            Text("Add New")
+        }
+    }
 }

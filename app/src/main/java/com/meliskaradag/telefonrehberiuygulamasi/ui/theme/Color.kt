@@ -23,7 +23,7 @@ val Gray950        = Color(0xFF202020)
 
 //Light scheme roles (Figma’ya göre)
 val Background     = Color.White         //ekran zemini
-val SurfaceColor   = Color.White         //kart vb.
+val SurfaceColor   = Gray50              //kart vb.
 val OnBackground   = Gray900             //ana metin
 val OnSurface      = Gray900
 val Outline        = Gray200             //kenarlıklar

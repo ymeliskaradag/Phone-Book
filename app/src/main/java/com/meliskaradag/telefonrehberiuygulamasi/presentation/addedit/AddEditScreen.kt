@@ -348,8 +348,8 @@ private fun OutlinedField(
         },
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge,
-        keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions.Default.copy(
-            keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = keyboardType
         ),
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
