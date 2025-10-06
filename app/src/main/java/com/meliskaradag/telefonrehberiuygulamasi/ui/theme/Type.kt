@@ -9,25 +9,6 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.text.font.Font
 import com.meliskaradag.telefonrehberiuygulamasi.R
 
-
-
-/**
- * Typography – Figma rehberine göre:
- *  - Display (Onest Regular 48 / lh 60 / letterSpacing -2%)
- *  - Headline Large  = Mulish ExtraBold 24
- *  - Headline Medium = Mulish Bold 20
- *  - Headline Small  = Mulish Medium 16
- *  - Title Large     = Mulish Medium 16      (AppBar / ekran başlıkları)
- *  - Title Medium    = Mulish Regular 14     (kart / bölüm başlığı)
- *  - Title Small     = Mulish SemiBold 12    (küçük başlık / chip)
- *  - Body Large      = Mulish Medium 14      (temel paragraf)
- *  - Body Medium     = Mulish Regular 12     (ikincil metin)
- *  - Body Small      = Mulish SemiBold 12    (body-bold eşlemesi)
- */
-//Bu kısım yükleme yaptıktan sonra değişecek
-/*val Mulish = FontFamily.SansSerif
-val Onest  = FontFamily.SansSerif*/
-
 val Mulish = FontFamily(
     Font(R.font.mulish_regular,  FontWeight.Normal),
     Font(R.font.mulish_medium,   FontWeight.Medium),

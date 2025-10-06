@@ -1,5 +1,6 @@
 package com.meliskaradag.telefonrehberiuygulamasi.presentation.contacts
 
+import com.meliskaradag.telefonrehberiuygulamasi.presentation.contacts.components.EmptyState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,8 +26,6 @@ import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray300
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray900
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Background
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray50
-import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray100
-import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Gray500
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.Outline
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.SurfaceColor
 import androidx.compose.ui.res.painterResource
@@ -35,13 +34,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.lazy.stickyHeader
+//import androidx.compose.foundation.lazy.stickyHeader
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.text.input.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.items as lazyItems
+import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -54,9 +55,10 @@ fun ContactsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val ui = vm.state.collectAsState().value
-    val state by androidx.lifecycle.compose.collectAsStateWithLifecycle(vm.state)
+    val state by vm.state.collectAsStateWithLifecycle()
+    val contactss = state.items
 
-    // Silme diyaloğunda gösterilecek hedef kişi (null ise dialog kapalı)
+    //Silme diyaloğunda gösterilecek hedef kişi (null ise dialog kapalı)
     var deleteTarget by remember { mutableStateOf<Contact?>(null) }
 
     Scaffold(
@@ -87,13 +89,13 @@ fun ContactsScreen(
         }
     ) { padding ->
         Column(Modifier.padding(padding).padding(horizontal = 16.dp)) {
-            SearchField(value = ui.query, onChange = { vm.onEvent(ContactsEvent.OnQuery(it)) })
+            SearchField(value = state.query, onChange = { vm.onEvent(ContactsEvent.OnQueryChange(it)) })
             Spacer(Modifier.height(12.dp))
 
-            if (state.items.isEmpty()) {
+            if (contactss.isEmpty()) {
                 EmptyState(onCreate = onAddNew)
             } else {
-                //val grouped = remember(ui.items) { ui.items.groupBy { it.firstLetter } }
+                //val grouped = remember(state.items) { state.items.groupBy { it.firstLetter } }
 
                 LazyColumn(
                     contentPadding = PaddingValues(vertical = 8.dp),
@@ -134,8 +136,10 @@ fun ContactsScreen(
             onDismissRequest = { deleteTarget = null },
             icon = {
                 Icon(
-                    painterResource(R.drawable.ic_delete),
+                    //painterResource(R.drawable.ic_delete),
+                    painter = painterResource(id = R.drawable.ic_delete),
                     contentDescription = null,
+                    modifier = Modifier.size(18.dp),
                     tint = ErrorRed
                 )
             },
@@ -160,11 +164,11 @@ fun ContactsScreen(
                         val id = deleteTarget!!.id
                         deleteTarget = null
 
-                        //VM tarafında sil
+                        //VM tarafında silmek için
                         vm.onEvent(ContactsEvent.OnDelete(id))
 
                         scope.launch {
-                            snackbarHostState.showSnackbar("User is deleted!")
+                            snackbarHostState.showSnackbar("Contact is deleted!")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -284,8 +288,10 @@ private fun SearchField(
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge,
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType = KeyboardType.Text
+            keyboardType = KeyboardType.Text,
+            //imeAction = ImeAction.Search
         ),
+        //keyboardActions = KeyboardActions(onSearch = { vm.onEvent(ContactsEvent.OnSearch) }),
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Gray50,
@@ -298,48 +304,4 @@ private fun SearchField(
             .fillMaxWidth()
             .height(48.dp)
     )
-}
-
-@Composable
-private fun EmptyState(
-    onCreate: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(Gray100),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.PersonAdd,
-                contentDescription = null,
-                tint = BrandBlue
-            )
-        }
-        Spacer(Modifier.height(16.dp))
-        Text(
-            "No contacts yet",
-            style = MaterialTheme.typography.titleLarge,
-            color = Gray900
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            "Create your first contact.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = Gray500
-        )
-        Spacer(Modifier.height(16.dp))
-        Button(onClick = onCreate) {
-            Text("Add New")
-        }
-    }
 }
