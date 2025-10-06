@@ -1,7 +1,6 @@
 package com.meliskaradag.telefonrehberiuygulamasi.presentation.addedit
 
 import android.Manifest
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -9,7 +8,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,101 +20,61 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.*
 import coil.compose.AsyncImage
 //import coil3.compose.AsyncImage
 import com.meliskaradag.telefonrehberiuygulamasi.R
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.*
-import kotlinx.coroutines.launch
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.meliskaradag.telefonrehberiuygulamasi.core.util.createImageUri
+import androidx.compose.foundation.BorderStroke
+//import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
-
-/**
- * Figma akışına uygun Add/Edit ekranı.
- * - title: "New Contact" / "Edit Contact"
- * - Cancel (sol, mavi), Done (sağ, mavi)
- * - Avatar + pembe glow, "Change Photo"
- * - 3 alan: First, Last, Phone
- * - "Save to My Phone Contact" (bookmark ikonlu; device’ta varsa disabled + bilgi metni)
- * - Photo kaynak seçimi: BottomSheet -> Camera / Gallery
- * - Done sonrası: Lottie "All Done!"
- */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditScreen(
     isEdit: Boolean,
     //başlangıç değerleri (edit ise dolu gelir)
+    contactId: String? = null,
     firstNameInit: String = "",
     lastNameInit: String = "",
     phoneInit: String = "",
     photoUrlInit: String? = null,
     isInDeviceContactsInit: Boolean = false,
-
     onCancel: () -> Unit,
-    onDone: (first: String, last: String, phone: String, photoUrl: String?) -> Unit,
-    onSaveToDevice: (first: String, last: String, phone: String) -> Unit, //cihaza kaydetmek için
+    onSaveToDevice: (first: String, last: String, phone: String) -> Unit
 ) {
-    val ctx = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val vm: AddEditVm = viewModel()
+    //val ctx = LocalContext.current
+    //val scope = rememberCoroutineScope()
+    val vm: AddEditViewModel = viewModel()
     val context = LocalContext.current
-    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
-
-    var first by remember { mutableStateOf(firstNameInit) }
-    var last by remember { mutableStateOf(lastNameInit) }
-    var phone by remember { mutableStateOf(phoneInit) }
-    var photoUrl by remember { mutableStateOf(photoUrlInit) }
-    var isInDevice by remember { mutableStateOf(isInDeviceContactsInit) }
+    val ui = vm.state.value
+    var localInDevice by remember { mutableStateOf(isInDeviceContactsInit) }
+    LaunchedEffect(contactId) { //mevcut veriyi göstermek için
+        vm.loadIfEdit(contactId)
+    }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showPhotoSheet by remember { mutableStateOf(false) }
 
     //Gallery picker
-    /*val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        if (uri != null) {
-            photoUrl = uri.toString()
-        }
-        showPhotoSheet = false
-    }*/
     val pickMediaLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        if (uri != null) vm.setLocalPhoto(uri)
-    }
+    ) { uri -> if (uri != null) vm.setLocalPhoto(uri) }
 
-
-    // Camera hızlı çözüm: TakePicturePreview (Bitmap döner)
-    /*val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bmp: Bitmap? ->
-        if (bmp != null) {
-            // basitçe cache’e kaydetmek yerine Coil direkt Bitmap’i gösterebilir;
-            // ama photoUrl String istiyoruz -> geçici ContentScale için Data URI kullanma yerine,
-            // Coil AsyncImage 'model = bmp' şeklinde de çalışır. Aşağıda model=Any yaptık.
-            photoUrl = null
-            //AsyncImage’da model=bmp
-            _tempPhotoBitmap = bmp
-        }
-        showPhotoSheet = false
-    }*/
+    //Camera
+    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
     val takePictureLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success && pendingCameraUri != null) {
-            vm.setLocalPhoto(pendingCameraUri)  //seçilen foto URI'sini VM'e yazmak için
-        }
+        if (success && pendingCameraUri != null) vm.setLocalPhoto(pendingCameraUri)
         pendingCameraUri = null
     }
 
@@ -129,6 +87,11 @@ fun AddEditScreen(
     var showDone by remember { mutableStateOf(false) }
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.done))
     val doneProgress by animateLottieCompositionAsState(composition, iterations = 1)
+    LaunchedEffect(ui.saved) {
+        if (ui.saved) {
+            showDone = true
+        }
+    }
 
     //Üst bar
     Scaffold(
@@ -136,7 +99,7 @@ fun AddEditScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        if (isEdit) "New Contact" else "New Contact", //Edit Contact
+                        if (isEdit) "Edit Contact" else "New Contact", //Edit Contact
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -145,11 +108,8 @@ fun AddEditScreen(
                 },
                 actions = {
                     TextButton(
-                        onClick = {
-                            onDone(first.trim(), last.trim(), phone.trim(), photoUrl)
-                            showDone = true
-                        },
-                        enabled = first.isNotBlank() && phone.isNotBlank()
+                        onClick = { vm.onSave() },
+                        enabled = ui.firstName.isNotBlank() && ui.phone.isNotBlank()
                     ) { Text("Done", color = BrandBlue) }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -171,11 +131,9 @@ fun AddEditScreen(
         ) {
             Spacer(Modifier.height(12.dp))
 
-            //Avatar + pembe glow
             AvatarWithGlow(
-                // local (kamera/galeri) varsa onu göster; yoksa API'den gelen url (String)
                 localUri = vm.localPhotoUri,
-                remoteUrl = photoUrl,
+                remoteUrl = ui.photoUrl,
                 fallbackRes = R.drawable.ic_person
             )
 
@@ -189,53 +147,56 @@ fun AddEditScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            //(Figma: Outlined, Gray50 zemin, Outline border)
             OutlinedField(
-                value = first, onChange = { first = it },
+                value = ui.firstName,
+                onChange = vm::onChangeFirst,
                 placeholder = "First Name"
             )
             Spacer(Modifier.height(12.dp))
             OutlinedField(
-                value = last, onChange = { last = it },
+                value = ui.lastName,
+                onChange = vm::onChangeLast,
                 placeholder = "Last Name"
             )
             Spacer(Modifier.height(12.dp))
             OutlinedField(
-                value = phone, onChange = { phone = it },
+                value = ui.phone,
+                onChange = vm::onChangePhone,
                 placeholder = "Phone Number",
                 keyboardType = KeyboardType.Phone
             )
 
             Spacer(Modifier.height(20.dp))
 
-
             SaveToPhoneButton(
-                enabled = !isInDevice,
+                enabled = !localInDevice,
                 onClick = {
                     if (Build.VERSION.SDK_INT < 33) {
                         permissionLauncher.launch(arrayOf(
                             Manifest.permission.CAMERA,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS
                         ))
                     } else {
-                        permissionLauncher.launch(arrayOf(Manifest.permission.CAMERA))
+                        permissionLauncher.launch(arrayOf(
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS
+                        ))
                     }
-                    onSaveToDevice(first.trim(), last.trim(), phone.trim())
-                    isInDevice = true
+                    onSaveToDevice(ui.firstName.trim(), ui.lastName.trim(), ui.phone.trim())
+                    localInDevice = true
                 },
                 modifier = Modifier.fillMaxWidth()
             )
 
-            AnimatedVisibility(visible = isInDevice) {
+            AnimatedVisibility(visible = localInDevice) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Icon(
-                        painterResource(R.drawable.ic_info),
-                        contentDescription = null,
-                        tint = Gray400
-                    )
+                    Icon(painterResource(R.drawable.ic_info), contentDescription = null, tint = Gray400)
                     Spacer(Modifier.width(6.dp))
                     Text(
                         "This contact is already saved your phone.",
@@ -313,10 +274,6 @@ fun AddEditScreen(
     }
 }
 
-
-//Geçici kamera bitmap'i
-//private var _tempPhotoBitmap: Bitmap? by mutableStateOf(null)
-
 @Composable
 private fun AvatarWithGlow(
     localUri: Uri?,
@@ -392,7 +349,7 @@ private fun OutlinedField(
         singleLine = true,
         textStyle = MaterialTheme.typography.bodyLarge,
         keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions.Default.copy(
-            keyboardType = keyboardType
+            keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
         ),
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(
@@ -456,5 +413,49 @@ private fun SheetAction(
             Spacer(Modifier.width(12.dp))
             Text(label, style = MaterialTheme.typography.titleMedium)
         }
+    }
+}
+
+fun android.content.Context.saveToDeviceContacts(first: String, last: String, phone: String) {
+    val ops = arrayListOf<android.content.ContentProviderOperation>()
+
+    //Raw contact
+    ops += android.content.ContentProviderOperation
+        .newInsert(android.provider.ContactsContract.RawContacts.CONTENT_URI)
+        .withValue(android.provider.ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+        .withValue(android.provider.ContactsContract.RawContacts.ACCOUNT_NAME, null)
+        .build()
+
+    //İsim
+    ops += android.content.ContentProviderOperation
+        .newInsert(android.provider.ContactsContract.Data.CONTENT_URI)
+        .withValueBackReference(android.provider.ContactsContract.Data.RAW_CONTACT_ID, 0)
+        .withValue(
+            android.provider.ContactsContract.Data.MIMETYPE,
+            android.provider.ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
+        )
+        .withValue(android.provider.ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, first)
+        .withValue(android.provider.ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, last)
+        .build()
+
+    //Telefon
+    ops += android.content.ContentProviderOperation
+        .newInsert(android.provider.ContactsContract.Data.CONTENT_URI)
+        .withValueBackReference(android.provider.ContactsContract.Data.RAW_CONTACT_ID, 0)
+        .withValue(
+            android.provider.ContactsContract.Data.MIMETYPE,
+            android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+        )
+        .withValue(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER, phone)
+        .withValue(
+            android.provider.ContactsContract.CommonDataKinds.Phone.TYPE,
+            android.provider.ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE
+        )
+        .build()
+
+    try {
+        contentResolver.applyBatch(android.provider.ContactsContract.AUTHORITY, ops)
+    } catch (_: Throwable) {
+        //unutma
     }
 }

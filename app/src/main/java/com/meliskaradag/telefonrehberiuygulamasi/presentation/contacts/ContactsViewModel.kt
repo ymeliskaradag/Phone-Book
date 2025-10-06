@@ -44,19 +44,19 @@ class ContactsViewModel(app: Application) : AndroidViewModel(app) {
                             .distinct().take(5)
                     )
                 } catch (t: Throwable) {
-                    _state.value = _state.value.copy(isLoading = false, error = "Arama başarısız")
+                    _state.value = _state.value.copy(isLoading = false, error = "Not Found")
                 }
             }
 
             is ContactsEvent.OnDelete -> viewModelScope.launch {
                 try { use.delete(e.id) } catch (_: Throwable) {
-                    _state.value = _state.value.copy(error = "Silme başarısız")
+                    _state.value = _state.value.copy(error = "Could not be deleted")
                 }
             }
 
             ContactsEvent.OnRefresh -> viewModelScope.launch {
                 try { use.refresh() } catch (t: Throwable) {
-                    _state.value = _state.value.copy(error = "Yenileme başarısız")
+                    _state.value = _state.value.copy(error = "Renewal Failed")
                 }
             }
         }

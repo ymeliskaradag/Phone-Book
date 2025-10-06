@@ -5,51 +5,139 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.googlefonts.GoogleFont
-import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.text.font.Font
+import com.meliskaradag.telefonrehberiuygulamasi.R
 
-//Google Fonts: Mulish & Onest
-private val provider = GoogleFont.Provider("com.google.android.gms.fonts", "com.google.android.gms")
-private val Mulish = FontFamily(Font(GoogleFont("Mulish"), provider))
-private val Onest  = FontFamily(Font(GoogleFont("Onest"),  provider))
 
-// Figma notlarına göre örnek roller (fotoğraftaki "Title 14", "Body 12" vb.)
+
+/**
+ * Typography – Figma rehberine göre:
+ *  - Display (Onest Regular 48 / lh 60 / letterSpacing -2%)
+ *  - Headline Large  = Mulish ExtraBold 24
+ *  - Headline Medium = Mulish Bold 20
+ *  - Headline Small  = Mulish Medium 16
+ *  - Title Large     = Mulish Medium 16      (AppBar / ekran başlıkları)
+ *  - Title Medium    = Mulish Regular 14     (kart / bölüm başlığı)
+ *  - Title Small     = Mulish SemiBold 12    (küçük başlık / chip)
+ *  - Body Large      = Mulish Medium 14      (temel paragraf)
+ *  - Body Medium     = Mulish Regular 12     (ikincil metin)
+ *  - Body Small      = Mulish SemiBold 12    (body-bold eşlemesi)
+ */
+//Bu kısım yükleme yaptıktan sonra değişecek
+/*val Mulish = FontFamily.SansSerif
+val Onest  = FontFamily.SansSerif*/
+
+val Mulish = FontFamily(
+    Font(R.font.mulish_regular,  FontWeight.Normal),
+    Font(R.font.mulish_medium,   FontWeight.Medium),
+    Font(R.font.mulish_semibold, FontWeight.SemiBold),
+    Font(R.font.mulish_bold,     FontWeight.Bold),
+    Font(R.font.mulish_extrabold,FontWeight.ExtraBold)
+)
+val Onest = FontFamily(
+    Font(R.font.onest_regular, FontWeight.Normal)
+)
 
 val AppTypography = Typography(
-    titleLarge = TextStyle( //"Contacts" başlığı
+
+    displayLarge = TextStyle(
+        fontFamily = Onest,
+        fontWeight = FontWeight.Normal,
+        fontSize = 48.sp,
+        lineHeight = 60.sp,
+        //-2% letter spacing -> -0.02em
+        letterSpacing = (-0.02).em,
+        color = Gray900
+    ),
+    //liste/bölüm başlıkları
+    headlineLarge = TextStyle(
+        fontFamily = Mulish,
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 24.sp,
+        lineHeight = 32.sp,
+        color = Gray950
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = Mulish,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        lineHeight = 28.sp,
+        color = Gray950
+    ),
+    headlineSmall = TextStyle(
         fontFamily = Mulish,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        color = Gray500
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        color = Gray950
+    ),
+    //uygulama başlıkları, kart başlıkları
+    titleLarge = TextStyle(      //AppBar/ekran başlığı
+        fontFamily = Mulish,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        color = Gray950
     ),
     titleMedium = TextStyle(
         fontFamily = Mulish,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        color = Gray500
+        lineHeight = 20.sp,
+        color = Gray950
     ),
-    bodyLarge = TextStyle( //liste isimleri
+    titleSmall = TextStyle(
         fontFamily = Mulish,
         fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
+        lineHeight = 16.sp,
         color = Gray950
     ),
-    bodyMedium = TextStyle( //telefon numarası vb.
+
+    //body
+    bodyLarge = TextStyle(
         fontFamily = Mulish,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp, lineHeight = 16.sp,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        color = Gray500
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = Mulish,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        color = Gray950
+    ),
+    bodySmall = TextStyle(
+        fontFamily = Mulish,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        color = Gray950
+    ),
+
+    //buton
+    labelLarge = TextStyle(
+        fontFamily = Mulish,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 16.sp,
         color = Gray950
     ),
     labelMedium = TextStyle(
         fontFamily = Mulish,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
-        color = Gray500
+        lineHeight = 14.sp,
+        color = Gray950
     ),
-    bodySmall = TextStyle(
+    labelSmall = TextStyle(
         fontFamily = Mulish,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp, lineHeight = 16.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        lineHeight = 12.sp,
         color = Gray950
     )
 )

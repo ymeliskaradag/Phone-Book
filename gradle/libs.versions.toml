@@ -1,15 +1,15 @@
 [versions]
 agp = "8.12.0"
-kotlin = "1.9.0"
+kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
+composeBom = "2024.10.01"
 lottieCompose = "6.4.0"
-retrofit = "3.0.0"
+retrofit = "2.11.0"
 #coil3 = "3.3.0"
 coil = "2.6.0"
 lottie = "6.6.9"
@@ -55,3 +55,4 @@ androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-lived
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

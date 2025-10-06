@@ -26,11 +26,32 @@ fun ContactsScreen(
     onAddNew: () -> Unit,
     onEdit: (String) -> Unit,
     vm: ContactsViewModel = viewModel()
+
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    // Silme diyaloğunda gösterilecek hedef kişi (null ise dialog kapalı)
+    var deleteTarget by remember { mutableStateOf<Contact?>(null) }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                // Yeşil başarı kartı (Figma: #12B76A)
+                Snackbar(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    containerColor = SuccessGreen,
+                    contentColor = Color.White
+                ) {
+                    Text(data.visuals.message, style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAdd,
+                onClick = onAddNew,
                 containerColor = BrandBlue,
                 contentColor = Color.White,
                 shape = CircleShape
@@ -70,7 +91,7 @@ fun ContactsScreen(
                                 ContactRow(
                                     contact = c,
                                     onClick = { onEdit(c.id) },
-                                    onDelete = { vm.onEvent(ContactsEvent.OnDelete(c.id)) }
+                                    onRequestDelete = { deleteTarget = it }
                                 )
                                 HorizontalDivider(
                                     thickness = 0.5.dp,
@@ -83,6 +104,72 @@ fun ContactsScreen(
             }
         }
     }
+    if (deleteTarget != null) {
+        AlertDialog(
+            onDismissRequest = { deleteTarget = null },
+            icon = {
+                Icon(
+                    painterResource(R.drawable.ic_delete),
+                    contentDescription = null,
+                    tint = ErrorRed
+                )
+            },
+            title = {
+                Text(
+                    "Delete Contact",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            },
+            text = {
+                Text(
+                    "Are you sure you want to delete ${deleteTarget!!.firstName} ${deleteTarget!!.lastName}? This action can’t be undone",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray400   //Figma gri metin
+                )
+            },
+            confirmButton = {
+                //Sağdaki kırmızı buton
+                Button(
+                    onClick = {
+                        val id = deleteTarget!!.id
+                        deleteTarget = null
+
+                        //VM tarafında sil
+                        vm.onEvent(ContactsEvent.OnDelete(id))
+
+                        scope.launch {
+                            snackbarHostState.showSnackbar("User is deleted!")
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ErrorRed,     //#FF0000
+                        contentColor = Color.White
+                    ),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                // Soldaki cancel
+                OutlinedButton(
+                    onClick = { deleteTarget = null },
+                    shape = MaterialTheme.shapes.medium,
+                    border = BorderStroke(1.dp, Gray300),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Gray900,
+                        containerColor = Color.Transparent
+                    )
+                ) {
+                    Text("No")
+                }
+            },
+            shape = MaterialTheme.shapes.large,   //Figma’daki yuvarlatma
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,13 +177,13 @@ fun ContactsScreen(
 private fun ContactRow(
     contact: Contact,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onRequestDelete: (Contact) -> Unit
 ) {
     //Material3 SwipeToDismissBox
     val dismissState = rememberSwipeToDismissBoxState()
 
     if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-        onDelete() //sola kaydırınca silmek için
+        onRequestDelete(contact) //sola kaydırınca silmek için
         LaunchedEffect(Unit) { dismissState.reset() }
     }
 
@@ -112,7 +199,7 @@ private fun ContactRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                Text("Sil", color = MaterialTheme.colorScheme.onErrorContainer)
+                Text("Delete", color = MaterialTheme.colorScheme.onErrorContainer)
             }
         },
         content = {

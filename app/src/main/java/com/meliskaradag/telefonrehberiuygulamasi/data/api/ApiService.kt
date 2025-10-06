@@ -50,7 +50,7 @@ data class UploadImageResponse(
 
 interface ApiService {
 
-    //CREATE  -> POST /api/User
+    //CREATE ->  POST /api/User
     @POST("api/User")
     suspend fun createUser(
         @Body body: UserCreateUpdateBody
@@ -74,7 +74,7 @@ interface ApiService {
     ): Response<ApiResponse<UserDto>>
 
     //DELETE -> DELETE /api/User/{id}
-    //Swagger data: {} döndürüyor, o yüzden JsonObject kullanıyoruz.
+    //Swagger data: {} döndürüyor, o yüzden JsonObject kullandım.
     @DELETE("api/User/{id}")
     suspend fun deleteUser(
         @Path("id") id: String
