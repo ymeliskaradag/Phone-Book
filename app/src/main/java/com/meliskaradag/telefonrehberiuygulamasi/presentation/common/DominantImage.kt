@@ -3,7 +3,6 @@ package com.meliskaradag.telefonrehberiuygulamasi.presentation.common
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,12 +14,13 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 
+//Baskın renge göre arkaplanın değişmesi için
 @Composable
 fun DominantShadowImage(url: String, modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
     var bg by remember { mutableStateOf(Color(0xFFEDEDED)) }
 
-    // URL değişince bir kez çalışması için
+    //URL değişince bir kez çalışması için
     LaunchedEffect(url) {
         try {
             val loader = ImageLoader(ctx)

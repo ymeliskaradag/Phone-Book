@@ -12,5 +12,5 @@
 
     <dimen name="icon_s">18dp</dimen>
     <dimen name="icon_m">24dp</dimen>
-    <dimen name="avatar_m">40dp</dimen> <!-- Figma’da yaklaşık -->
+    <dimen name="avatar_m">40dp</dimen> //dimens kullanırsam diye
 </resources>

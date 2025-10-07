@@ -2,13 +2,16 @@ package com.meliskaradag.telefonrehberiuygulamasi.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.meliskaradag.telefonrehberiuygulamasi.R
 import com.meliskaradag.telefonrehberiuygulamasi.ui.theme.*
 
 @Composable
